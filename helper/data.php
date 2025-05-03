@@ -3,8 +3,8 @@
 session_start();
 include '../setting.php';
 include '../helper.php';
-if(!empty($_SESSION['codekop_session'])) {
-    $uid =  (int)$_SESSION['codekop_session']['id'];
+if(!empty($_SESSION['supeno_session'])) {
+    $uid =  (int)$_SESSION['supeno_session']['id'];
     $sql_users = "SELECT * FROM users WHERE id = ?";
     $row_users = $connectdb->prepare($sql_users);
     $row_users->execute(array($uid));
@@ -28,7 +28,7 @@ if(!empty(getGet('aksi') == 'barang')) {
 }
 
 if(!empty(getGet('aksi') == 'nota-jual')) {
-    $query = "SELECT users.name, pelanggan.nama_pelanggan, penjualan.* 
+    $query = "SELECT users.name, pelanggan.nama_pelanggan, (penjualan.bayar - penjualan.total) AS kurang, penjualan.* 
                 FROM penjualan 
                 LEFT JOIN users 
                 ON penjualan.id_member = users.id 
@@ -40,6 +40,7 @@ if(!empty(getGet('aksi') == 'nota-jual')) {
     } else {
         $where  = null;
     }
+
     if(!empty(getGet('thn', true))) {
         $periode = getGet('thn', true).'-'.getGet('bln', true);
         $isWhere = " penjualan.periode = '".$periode."' ";
@@ -50,10 +51,13 @@ if(!empty(getGet('aksi') == 'nota-jual')) {
     } else {
         $isWhere = " penjualan.periode = '".date('Y-m')."' ";
     }
-    if($_SESSION['codekop_session']['akses']== 5) {
-        $isWhere .= " AND penjualan.id_member = ".$_SESSION['codekop_session']['id'];
+    if($_SESSION['supeno_session']['akses']== 5) {
+        $isWhere .= " AND penjualan.id_member = ".$_SESSION['supeno_session']['id'];
     }
 
+    if(!empty(getGet('status_bayar', true))) {
+        $isWhere  .= " AND status_bayar = '".getGet('status_bayar')."'";
+    }
 
     echo get_tables_query($connectdb, $query, $search, $where, $isWhere);
 }

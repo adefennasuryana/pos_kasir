@@ -1,4 +1,4 @@
-<?php if(!empty($_SESSION['codekop_session']['akses'] != 1)){ redirect($baseURL); }?>
+<?php if(!empty($_SESSION['supeno_session']['akses'] != 1)){ redirect($baseURL); }?>
 <?php 
     $bulan_tes =array(
         '01'=>"Januari",
